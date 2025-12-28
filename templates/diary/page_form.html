@@ -6,9 +6,11 @@
   <title>サプーの日記</title>
 </head>
 <body>
-  <h1>サプーの日記</h1>
-  <p>{{ datetime_now }}</p>
-  <br>
-  <a href="{% url 'diary:page_create' %}">日記を書く</a>
+  <h2>日記を書く</h2>
+  <form action="" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">保存</button>
+  </form>
 </body>
 </html>

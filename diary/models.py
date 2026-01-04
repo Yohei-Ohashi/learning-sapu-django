@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 
 from django.db import models
 
@@ -18,3 +19,9 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
+
+    def delete(self, *args, **kwargs):
+        picture = self.picture
+        super().delete(*args, **kwargs)  # 基底クラスのdeleteを呼び出す
+        if picture:
+            Path(picture.path).unlink(missing_ok=True)

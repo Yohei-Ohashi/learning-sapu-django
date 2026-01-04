@@ -68,7 +68,7 @@ class PageUpdateView(LoginRequiredMixin, View):
             if new_picture_uploaded and old_picture and os.path.exists(old_picture):
                 os.remove(old_picture)
             return redirect("diary:page_detail", id=id)
-        return render(request, "diary/page_form.html", {"form": form})
+        return render(request, "diary/page_update.html", {"form": form})
 
 
 class PageDeleteView(LoginRequiredMixin, View):

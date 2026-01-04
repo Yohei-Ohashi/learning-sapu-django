@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -41,7 +42,36 @@ class PageDetailView(View):
         return render(request, "diary/page_detail.html", {"page": page})
 
 
+class PageUpdateView(View):
+    def get(self, request, id):
+        page = get_object_or_404(Page, id=id)
+        form = PageForm(instance=page)
+        return render(request, "diary/page_update.html", {"form": form})
+
+    def post(self, request, id):
+        page = get_object_or_404(Page, id=id)
+
+        # 古い画像ファイルのパスを保存（新しい画像がアップロードされる前に）
+        old_picture = None
+        if page.picture:  # 既存の画像がある場合
+            old_picture = page.picture.path  # ファイルシステム上のパスを取得
+
+        form = PageForm(request.POST, request.FILES, instance=page)
+        if form.is_valid():
+            # 新しい画像がアップロードされたかどうかを確認
+            new_picture_uploaded = "picture" in request.FILES
+
+            form.save()  # フォームを保存（新しい画像があれば保存される）
+
+            # 新しい画像がアップロードされ、かつ古い画像が存在する場合、古い画像を削除
+            if new_picture_uploaded and old_picture and os.path.exists(old_picture):
+                os.remove(old_picture)
+            return redirect("diary:page_detail", id=id)
+        return render(request, "diary/page_form.html", {"form": form})
+
+
 index = IndexView.as_view()
 page_create = PageCreateView.as_view()
 page_list = PageListView.as_view()
 page_detail = PageDetailView.as_view()
+page_update = PageUpdateView.as_view()
